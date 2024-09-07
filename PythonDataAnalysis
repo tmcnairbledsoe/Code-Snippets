@@ -9,6 +9,7 @@
 # K-nearest neighbor
 # Convolutional Neural Net
 # Reccurent Neural Net
+# Find Best Model
 
 #Cleaning:
 # CategoricalMapping
@@ -476,6 +477,84 @@ def build_and_train_rnn(epochs=5):
 
 # Example usage
 rnn_model, rnn_history, rnn_test_acc = build_and_train_rnn(epochs=5)
+
+import numpy as np
+from sklearn.model_selection import train_test_split, GridSearchCV
+from sklearn.preprocessing import StandardScaler
+from sklearn.feature_selection import SelectKBest, f_classif
+from sklearn.pipeline import Pipeline
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense
+from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
+from keras_tuner import RandomSearch
+from sklearn.metrics import accuracy_score
+
+# Create a function that builds the Sequential model
+def create_model(optimizer='adam', activation='relu', neurons=32):
+    model = Sequential()
+    model.add(Dense(neurons, input_dim=8, activation=activation))
+    model.add(Dense(neurons, activation=activation))
+    model.add(Dense(1, activation='sigmoid'))  # Binary classification
+    model.compile(loss='binary_crossentropy', optimizer=optimizer, metrics=['accuracy'])
+    return model
+
+# Function to find the best Sequential model, features, and parameters
+def find_best_model(X, y):
+    # Feature scaling
+    scaler = StandardScaler()
+
+    # Feature selection
+    feature_selector = SelectKBest(score_func=f_classif)
+
+    # Keras model wrapped in KerasClassifier
+    model = KerasClassifier(build_fn=create_model, epochs=50, batch_size=10, verbose=0)
+
+    # Create a pipeline for feature selection, scaling, and model training
+    pipeline = Pipeline([
+        ('scaler', scaler),
+        ('feature_selector', feature_selector),
+        ('model', model)
+    ])
+
+    # Define the parameter grid
+    param_grid = {
+        'feature_selector__k': [5, 8, 10],  # Number of features to select
+        'model__neurons': [16, 32, 64],  # Number of neurons
+        'model__optimizer': ['adam', 'rmsprop'],  # Optimizers
+        'model__activation': ['relu', 'tanh'],  # Activation functions
+        'model__batch_size': [10, 20],  # Batch size
+        'model__epochs': [50, 100]  # Number of epochs
+    }
+
+    # Perform grid search using GridSearchCV
+    grid = GridSearchCV(estimator=pipeline, param_grid=param_grid, cv=3, n_jobs=-1)
+
+    # Fit the grid search
+    grid_result = grid.fit(X, y)
+
+    # Best parameters and features
+    best_params = grid_result.best_params_
+    best_features = best_params['feature_selector__k']
+
+    print("Best Features Selected:", best_features)
+    print("Best Parameters:", best_params)
+
+    return grid_result.best_estimator_, grid_result.best_params_
+
+# Example of usage:
+if __name__ == '__main__':
+    # Generate a sample dataset (e.g., 1000 samples, 10 features)
+    X, y = np.random.rand(1000, 10), np.random.randint(0, 2, 1000)
+
+    # Find the best model, features, and parameters
+    best_model, best_params = find_best_model(X, y)
+
+    # Test the best model with a train-test split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    
+    best_model.fit(X_train, y_train)
+    y_pred = best_model.predict(X_test)
+    print("Accuracy on test data:", accuracy_score(y_test, y_pred))
 
 
 import pandas as pd
