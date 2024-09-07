@@ -1,0 +1,25 @@
+# Create example data
+# Independent variable (predictor)
+x <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+
+# Dependent variable (response)
+y <- c(2, 4, 5, 4, 5, 6, 7, 8, 9, 10)
+
+# Create a dataframe
+data <- data.frame(x, y)
+
+# Fit a linear regression model
+model <- lm(y ~ x, data = data)
+
+# Print the summary of the model to see results
+summary(model)
+
+# Plot the data and the regression line
+plot(x, y, main="Linear Regression", xlab="x", ylab="y", pch=19)
+abline(model, col="blue")
+Explanation:
+Data creation: The example dataset consists of independent variable x and dependent variable y.
+lm() function: This function is used to fit a linear model in R. Here, y ~ x specifies that we want to model y as a function of x.
+summary(): Displays the details of the fitted model, including coefficients, R-squared value, and statistical significance.
+Plotting: The plot() function creates a scatter plot of the data, and abline() adds the regression line to the plot.
+The output will show the slope (coefficient) and intercept of the linear regression line, along with the statistical significance of the model.
