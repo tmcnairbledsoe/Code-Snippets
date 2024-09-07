@@ -1,3 +1,50 @@
+// 1. Sorting Algorithms
+// Bubble Sort: A simple sorting algorithm that repeatedly steps through the list, compares adjacent elements, and swaps them if they are in the wrong order.
+// Merge Sort: A divide-and-conquer algorithm that splits the array into halves, sorts them recursively, and merges the sorted halves.
+// Quick Sort: A divide-and-conquer algorithm that selects a pivot and partitions the array into elements less than and greater than the pivot.
+// Insertion Sort: Builds the sorted array one element at a time by inserting elements into their correct position.
+
+// 2. Searching Algorithms
+// Linear Search: Sequentially checks each element of the list until the target is found or the list ends.
+// Binary Search: Efficiently searches a sorted array by repeatedly dividing the search interval in half.
+
+// 3. Tree Traversal Algorithms
+// In-order Traversal: Left subtree -> Root -> Right subtree.
+// Pre-order Traversal: Root -> Left subtree -> Right subtree.
+// Post-order Traversal: Left subtree -> Right subtree -> Root.
+// Breadth-First Search (BFS): Visits all nodes at the present depth before moving on to nodes at the next depth level.
+// Depth-First Search (DFS): Explores as far along a branch as possible before backtracking.
+
+// 4. Graph Algorithms
+// Dijkstra's Algorithm: Finds the shortest path between nodes in a graph.
+// A Algorithm*: A pathfinding algorithm using heuristics to find the optimal path.
+// Kruskal's Algorithm: A minimum spanning tree algorithm that finds the edge with the lowest cost and adds it to the growing spanning tree.
+// Prim's Algorithm: Another minimum spanning tree algorithm that grows the tree from a starting node by adding the cheapest edge to the tree.
+
+// 5. Dynamic Programming
+// Fibonacci Sequence: Calculates the nth Fibonacci number using memoization or tabulation.
+// Knapsack Problem: Finds the most valuable combination of items that fit within a given weight limit.
+// Longest Common Subsequence (LCS): Finds the longest sequence that is common between two sequences.
+
+// 6. Greedy Algorithms
+// Activity Selection Problem: Selects the maximum number of activities that don't overlap.
+// Huffman Coding: An algorithm for lossless data compression that assigns variable-length codes to input characters based on their frequencies.
+
+// 7. Object Cloning Algorithms
+// Shallow Copy: Duplicates an object, but only copies references for any objects contained within.
+// Deep Copy: Creates a new copy of an object and recursively copies all objects it contains.
+
+// 8. Design Patterns (High-Level Algorithms)
+// Singleton Pattern: Ensures that a class has only one instance and provides a global point of access to it.
+// Factory Pattern: Provides a way to create objects without specifying the exact class.
+// Observer Pattern: Defines a subscription mechanism to allow multiple objects to listen to events and get notified.
+// Decorator Pattern: Allows behavior to be added to individual objects, dynamically, without affecting the behavior of other objects.
+
+// Tips and Tricks:
+// Unmanaged Queue
+
+
+
 public static void BubbleSort(int[] arr)
     {
         int n = arr.Length;
@@ -15,3 +62,1085 @@ public static void BubbleSort(int[] arr)
             }
         }
     }
+
+class MergeSort
+{
+    // Main Merge Sort method
+    public static void MergeSortArray(int[] array, int left, int right)
+    {
+        if (left < right)
+        {
+            int mid = (left + right) / 2;
+
+            // Recursively sort the two halves
+            MergeSortArray(array, left, mid);
+            MergeSortArray(array, mid + 1, right);
+
+            // Merge the two sorted halves
+            Merge(array, left, mid, right);
+        }
+    }
+
+    // Method to merge two sorted subarrays into one sorted array
+    private static void Merge(int[] array, int left, int mid, int right)
+    {
+        int n1 = mid - left + 1; // Size of the left subarray
+        int n2 = right - mid;     // Size of the right subarray
+
+        // Create temporary arrays to hold the left and right subarrays
+        int[] leftArray = new int[n1];
+        int[] rightArray = new int[n2];
+
+        // Copy data into the temporary arrays
+        for (int i = 0; i < n1; i++)
+            leftArray[i] = array[left + i];
+        for (int j = 0; j < n2; j++)
+            rightArray[j] = array[mid + 1 + j];
+
+        // Merge the two subarrays back into the original array
+        int iIndex = 0, jIndex = 0;
+        int k = left;
+
+        while (iIndex < n1 && jIndex < n2)
+        {
+            if (leftArray[iIndex] <= rightArray[jIndex])
+            {
+                array[k] = leftArray[iIndex];
+                iIndex++;
+            }
+            else
+            {
+                array[k] = rightArray[jIndex];
+                jIndex++;
+            }
+            k++;
+        }
+
+        // Copy any remaining elements of the left subarray
+        while (iIndex < n1)
+        {
+            array[k] = leftArray[iIndex];
+            iIndex++;
+            k++;
+        }
+
+        // Copy any remaining elements of the right subarray
+        while (jIndex < n2)
+        {
+            array[k] = rightArray[jIndex];
+            jIndex++;
+            k++;
+        }
+    }
+
+    // Helper method to print the array
+    public static void PrintArray(int[] array)
+    {
+        foreach (int item in array)
+        {
+            Console.Write(item + " ");
+        }
+        Console.WriteLine();
+    }
+
+    // Main method to test the Merge Sort algorithm
+    static void Main(string[] args)
+    {
+        int[] array = { 38, 27, 43, 3, 9, 82, 10 };
+        Console.WriteLine("Original Array:");
+        PrintArray(array);
+
+        MergeSortArray(array, 0, array.Length - 1);
+
+        Console.WriteLine("Sorted Array:");
+        PrintArray(array);
+    }
+}
+
+class QuickSort
+{
+    // Main Quick Sort method
+    public static void QuickSortArray(int[] array, int low, int high)
+    {
+        if (low < high)
+        {
+            // Partition the array and get the pivot index
+            int pivotIndex = Partition(array, low, high);
+
+            // Recursively sort elements before and after the partition
+            QuickSortArray(array, low, pivotIndex - 1);
+            QuickSortArray(array, pivotIndex + 1, high);
+        }
+    }
+
+    // Method to partition the array around the pivot
+    private static int Partition(int[] array, int low, int high)
+    {
+        // Choose the last element as the pivot
+        int pivot = array[high];
+        int i = low - 1; // Index of the smaller element
+
+        for (int j = low; j < high; j++)
+        {
+            // If the current element is smaller than or equal to the pivot
+            if (array[j] <= pivot)
+            {
+                i++; // Move the smaller element index forward
+
+                // Swap array[i] and array[j]
+                int temp = array[i];
+                array[i] = array[j];
+                array[j] = temp;
+            }
+        }
+
+        // Swap the pivot element with the element at i+1 to put it in the correct position
+        int temp1 = array[i + 1];
+        array[i + 1] = array[high];
+        array[high] = temp1;
+
+        // Return the index of the pivot
+        return i + 1;
+    }
+
+    // Helper method to print the array
+    public static void PrintArray(int[] array)
+    {
+        foreach (int item in array)
+        {
+            Console.Write(item + " ");
+        }
+        Console.WriteLine();
+    }
+
+    // Main method to test the Quick Sort algorithm
+    static void Main(string[] args)
+    {
+        int[] array = { 10, 80, 30, 90, 40, 50, 70 };
+        Console.WriteLine("Original Array:");
+        PrintArray(array);
+
+        QuickSortArray(array, 0, array.Length - 1);
+
+        Console.WriteLine("Sorted Array:");
+        PrintArray(array);
+    }
+}
+
+using System;
+
+class InsertionSort
+{
+    // Main Insertion Sort method
+    public static void InsertionSortArray(int[] array)
+    {
+        for (int i = 1; i < array.Length; i++)
+        {
+            int key = array[i];  // Current element to be inserted
+            int j = i - 1;
+
+            // Move elements of the sorted portion that are greater than key to one position ahead
+            while (j >= 0 && array[j] > key)
+            {
+                array[j + 1] = array[j];
+                j--;
+            }
+            array[j + 1] = key;  // Insert the key at the correct position
+        }
+    }
+
+    // Helper method to print the array
+    public static void PrintArray(int[] array)
+    {
+        foreach (int item in array)
+        {
+            Console.Write(item + " ");
+        }
+        Console.WriteLine();
+    }
+
+    // Main method to test the Insertion Sort algorithm
+    static void Main(string[] args)
+    {
+        int[] array = { 12, 11, 13, 5, 6 };
+        Console.WriteLine("Original Array:");
+        PrintArray(array);
+
+        InsertionSortArray(array);
+
+        Console.WriteLine("Sorted Array:");
+        PrintArray(array);
+    }
+}
+
+
+using System;
+
+class LinearSearch
+{
+    // Method to perform Linear Search
+    public static int LinearSearchArray(int[] array, int target)
+    {
+        // Traverse the array element by element
+        for (int i = 0; i < array.Length; i++)
+        {
+            // If the current element matches the target, return its index
+            if (array[i] == target)
+            {
+                return i;
+            }
+        }
+        // Return -1 if the target is not found in the array
+        return -1;
+    }
+
+    // Helper method to print the result of the search
+    public static void PrintResult(int index, int target)
+    {
+        if (index != -1)
+        {
+            Console.WriteLine("Element " + target + " found at index: " + index);
+        }
+        else
+        {
+            Console.WriteLine("Element " + target + " not found in the array.");
+        }
+    }
+
+    // Main method to test the Linear Search algorithm
+    static void Main(string[] args)
+    {
+        int[] array = { 2, 4, 0, 1, 9, 8 };
+        int target = 9;
+
+        Console.WriteLine("Array: ");
+        foreach (int item in array)
+        {
+            Console.Write(item + " ");
+        }
+        Console.WriteLine("\nSearching for: " + target);
+
+        int result = LinearSearchArray(array, target);
+        PrintResult(result, target);
+    }
+}
+
+
+
+using System;
+
+class BinarySearch
+{
+    // Method to perform Binary Search
+    public static int BinarySearchArray(int[] array, int target)
+    {
+        int left = 0;
+        int right = array.Length - 1;
+
+        // Loop until the search space is exhausted
+        while (left <= right)
+        {
+            int mid = left + (right - left) / 2; // Find the middle element
+
+            // Check if the target is at the middle
+            if (array[mid] == target)
+                return mid;
+
+            // If the target is greater, ignore the left half
+            if (array[mid] < target)
+                left = mid + 1;
+
+            // If the target is smaller, ignore the right half
+            else
+                right = mid - 1;
+        }
+
+        // Return -1 if the target is not found
+        return -1;
+    }
+
+    // Helper method to print the result of the search
+    public static void PrintResult(int index, int target)
+    {
+        if (index != -1)
+        {
+            Console.WriteLine("Element " + target + " found at index: " + index);
+        }
+        else
+        {
+            Console.WriteLine("Element " + target + " not found in the array.");
+        }
+    }
+
+    // Main method to test the Binary Search algorithm
+    static void Main(string[] args)
+    {
+        // Array must be sorted for binary search
+        int[] array = { 1, 3, 5, 7, 9, 11, 13, 15 };
+        int target = 9;
+
+        Console.WriteLine("Array: ");
+        foreach (int item in array)
+        {
+            Console.Write(item + " ");
+        }
+        Console.WriteLine("\nSearching for: " + target);
+
+        int result = BinarySearchArray(array, target);
+        PrintResult(result, target);
+    }
+}
+
+
+using System;
+using System.Collections.Generic;
+
+class DijkstraAlgorithm
+{
+    // Method to find the vertex with the minimum distance value from the set of vertices not yet processed
+    public static int MinDistance(int[] dist, bool[] sptSet, int verticesCount)
+    {
+        int min = int.MaxValue;
+        int minIndex = -1;
+
+        for (int v = 0; v < verticesCount; v++)
+        {
+            if (!sptSet[v] && dist[v] <= min)
+            {
+                min = dist[v];
+                minIndex = v;
+            }
+        }
+        return minIndex;
+    }
+
+    // Method to print the final shortest distances
+    public static void PrintSolution(int[] dist, int verticesCount)
+    {
+        Console.WriteLine("Vertex \t\t Distance from Source");
+        for (int i = 0; i < verticesCount; i++)
+        {
+            Console.WriteLine(i + " \t\t " + dist[i]);
+        }
+    }
+
+    // Method to implement Dijkstra's Algorithm
+    public static void Dijkstra(int[,] graph, int source, int verticesCount)
+    {
+        int[] dist = new int[verticesCount]; // Output array. dist[i] holds the shortest distance from source to i
+        bool[] sptSet = new bool[verticesCount]; // sptSet[i] will be true if vertex i is included in the shortest path tree
+
+        // Initialize all distances as INFINITE and sptSet[] as false
+        for (int i = 0; i < verticesCount; i++)
+        {
+            dist[i] = int.MaxValue;
+            sptSet[i] = false;
+        }
+
+        // Distance of the source vertex to itself is always 0
+        dist[source] = 0;
+
+        // Find shortest path for all vertices
+        for (int count = 0; count < verticesCount - 1; count++)
+        {
+            // Pick the minimum distance vertex from the set of vertices not yet processed
+            int u = MinDistance(dist, sptSet, verticesCount);
+
+            // Mark the picked vertex as processed
+            sptSet[u] = true;
+
+            // Update dist[] value of the adjacent vertices of the picked vertex
+            for (int v = 0; v < verticesCount; v++)
+            {
+                // Update dist[v] if it's not in sptSet, there is an edge from u to v, and the total weight of the path
+                // from source to v through u is smaller than the current value of dist[v]
+                if (!sptSet[v] && graph[u, v] != 0 && dist[u] != int.MaxValue && dist[u] + graph[u, v] < dist[v])
+                {
+                    dist[v] = dist[u] + graph[u, v];
+                }
+            }
+        }
+
+        // Print the constructed distance array
+        PrintSolution(dist, verticesCount);
+    }
+
+    // Main method to test the Dijkstra's Algorithm
+    static void Main(string[] args)
+    {
+        // Create a graph represented by a 2D array (adjacency matrix)
+        // 0 indicates no direct edge between the vertices
+        int[,] graph = new int[,] {
+            { 0, 10, 0, 0, 0, 0 },
+            { 10, 0, 5, 0, 0, 0 },
+            { 0, 5, 0, 15, 20, 0 },
+            { 0, 0, 15, 0, 35, 10 },
+            { 0, 0, 20, 35, 0, 5 },
+            { 0, 0, 0, 10, 5, 0 }
+        };
+
+        int sourceVertex = 0;
+        Console.WriteLine("Dijkstra's Shortest Path Algorithm:");
+        Dijkstra(graph, sourceVertex, graph.GetLength(0));
+    }
+}
+
+
+using System;
+using System.Collections.Generic;
+
+class AStarAlgorithm
+{
+    public class Node
+    {
+        public int X { get; set; }
+        public int Y { get; set; }
+        public int G { get; set; } // Cost from start to current node
+        public int H { get; set; } // Heuristic cost estimate to goal
+        public int F { get { return G + H; } } // Total cost (F = G + H)
+        public Node Parent { get; set; } // Parent node for path tracing
+
+        public Node(int x, int y)
+        {
+            X = x;
+            Y = y;
+        }
+
+        public override bool Equals(object obj)
+        {
+            Node other = obj as Node;
+            return other != null && this.X == other.X && this.Y == other.Y;
+        }
+
+        public override int GetHashCode()
+        {
+            return X.GetHashCode() ^ Y.GetHashCode();
+        }
+    }
+
+    // Heuristic function: Manhattan Distance
+    private static int Heuristic(Node a, Node b)
+    {
+        return Math.Abs(a.X - b.X) + Math.Abs(a.Y - b.Y);
+    }
+
+    // Method to find neighbors of the current node (4-way movement: up, down, left, right)
+    private static List<Node> GetNeighbors(Node node, int[,] grid)
+    {
+        List<Node> neighbors = new List<Node>();
+
+        int rows = grid.GetLength(0);
+        int cols = grid.GetLength(1);
+
+        if (node.X - 1 >= 0 && grid[node.X - 1, node.Y] == 0) neighbors.Add(new Node(node.X - 1, node.Y)); // Left
+        if (node.X + 1 < rows && grid[node.X + 1, node.Y] == 0) neighbors.Add(new Node(node.X + 1, node.Y)); // Right
+        if (node.Y - 1 >= 0 && grid[node.X, node.Y - 1] == 0) neighbors.Add(new Node(node.X, node.Y - 1)); // Up
+        if (node.Y + 1 < cols && grid[node.X, node.Y + 1] == 0) neighbors.Add(new Node(node.X, node.Y + 1)); // Down
+
+        return neighbors;
+    }
+
+    // A* Algorithm implementation
+    public static List<Node> AStar(int[,] grid, Node start, Node goal)
+    {
+        HashSet<Node> openSet = new HashSet<Node>(); // Nodes to be evaluated
+        HashSet<Node> closedSet = new HashSet<Node>(); // Nodes already evaluated
+
+        start.G = 0;
+        start.H = Heuristic(start, goal);
+        openSet.Add(start);
+
+        while (openSet.Count > 0)
+        {
+            // Get the node with the lowest F score
+            Node current = null;
+            foreach (var node in openSet)
+            {
+                if (current == null || node.F < current.F)
+                {
+                    current = node;
+                }
+            }
+
+            // If we reached the goal, reconstruct and return the path
+            if (current.Equals(goal))
+            {
+                List<Node> path = new List<Node>();
+                while (current != null)
+                {
+                    path.Add(current);
+                    current = current.Parent;
+                }
+                path.Reverse();
+                return path; // Return the reconstructed path
+            }
+
+            // Move current node from openSet to closedSet
+            openSet.Remove(current);
+            closedSet.Add(current);
+
+            // Evaluate neighbors of the current node
+            foreach (var neighbor in GetNeighbors(current, grid))
+            {
+                if (closedSet.Contains(neighbor))
+                    continue;
+
+                int tentativeG = current.G + 1; // Distance from start to neighbor
+
+                if (!openSet.Contains(neighbor))
+                {
+                    neighbor.G = tentativeG;
+                    neighbor.H = Heuristic(neighbor, goal);
+                    neighbor.Parent = current;
+                    openSet.Add(neighbor); // Add neighbor to openSet if not already in it
+                }
+                else if (tentativeG < neighbor.G)
+                {
+                    neighbor.G = tentativeG;
+                    neighbor.Parent = current; // Update the parent to the better path
+                }
+            }
+        }
+
+        return null; // No path found
+    }
+
+    // Method to print the grid and the path found by A*
+    public static void PrintGridWithPath(int[,] grid, List<Node> path)
+    {
+        for (int i = 0; i < grid.GetLength(0); i++)
+        {
+            for (int j = 0; j < grid.GetLength(1); j++)
+            {
+                if (path.Exists(n => n.X == i && n.Y == j))
+                {
+                    Console.Write("P "); // P represents path
+                }
+                else
+                {
+                    Console.Write(grid[i, j] == 1 ? "# " : ". "); // # represents obstacle, . represents free space
+                }
+            }
+            Console.WriteLine();
+        }
+    }
+
+    // Main method to test the A* algorithm
+    static void Main(string[] args)
+    {
+        // Define the grid (0: free space, 1: obstacle)
+        int[,] grid = new int[,]
+        {
+            { 0, 1, 0, 0, 0 },
+            { 0, 1, 0, 1, 0 },
+            { 0, 0, 0, 1, 0 },
+            { 0, 1, 0, 0, 0 },
+            { 0, 0, 0, 1, 0 }
+        };
+
+        Node start = new Node(0, 0); // Start position
+        Node goal = new Node(4, 4); // Goal position
+
+        List<Node> path = AStar(grid, start, goal);
+
+        if (path != null)
+        {
+            Console.WriteLine("Path found:");
+            PrintGridWithPath(grid, path);
+        }
+        else
+        {
+            Console.WriteLine("No path found.");
+        }
+    }
+}
+
+
+using System;
+using System.Collections.Generic;
+
+class KruskalAlgorithm
+{
+    public class Edge : IComparable<Edge>
+    {
+        public int Source { get; set; }
+        public int Destination { get; set; }
+        public int Weight { get; set; }
+
+        public Edge(int source, int destination, int weight)
+        {
+            Source = source;
+            Destination = destination;
+            Weight = weight;
+        }
+
+        // Compare edges by weight
+        public int CompareTo(Edge other)
+        {
+            return this.Weight.CompareTo(other.Weight);
+        }
+    }
+
+    // Class to represent a subset for union-find
+    public class Subset
+    {
+        public int Parent { get; set; }
+        public int Rank { get; set; }
+
+        public Subset(int parent, int rank)
+        {
+            Parent = parent;
+            Rank = rank;
+        }
+    }
+
+    // Find the subset (with path compression)
+    public static int Find(Subset[] subsets, int i)
+    {
+        if (subsets[i].Parent != i)
+        {
+            subsets[i].Parent = Find(subsets, subsets[i].Parent);
+        }
+        return subsets[i].Parent;
+    }
+
+    // Union of two subsets (by rank)
+    public static void Union(Subset[] subsets, int x, int y)
+    {
+        int rootX = Find(subsets, x);
+        int rootY = Find(subsets, y);
+
+        if (subsets[rootX].Rank < subsets[rootY].Rank)
+        {
+            subsets[rootX].Parent = rootY;
+        }
+        else if (subsets[rootX].Rank > subsets[rootY].Rank)
+        {
+            subsets[rootY].Parent = rootX;
+        }
+        else
+        {
+            subsets[rootY].Parent = rootX;
+            subsets[rootX].Rank++;
+        }
+    }
+
+    // Kruskal's Algorithm to find MST
+    public static void KruskalMST(List<Edge> edges, int verticesCount)
+    {
+        List<Edge> result = new List<Edge>(); // To store the resulting MST
+
+        // Sort edges by their weights
+        edges.Sort();
+
+        // Allocate memory for union-find subsets
+        Subset[] subsets = new Subset[verticesCount];
+        for (int v = 0; v < verticesCount; ++v)
+        {
+            subsets[v] = new Subset(v, 0);
+        }
+
+        int e = 0; // Count of edges included in the MST
+        int i = 0; // Index for the sorted edges
+
+        // Number of edges in the MST will be V-1
+        while (e < verticesCount - 1)
+        {
+            // Pick the smallest edge
+            Edge nextEdge = edges[i++];
+            
+            int x = Find(subsets, nextEdge.Source);
+            int y = Find(subsets, nextEdge.Destination);
+
+            // If including this edge does not form a cycle
+            if (x != y)
+            {
+                result.Add(nextEdge);
+                Union(subsets, x, y);
+                e++; // Increment count of edges in the MST
+            }
+        }
+
+        // Print the contents of result[] to display the MST
+        Console.WriteLine("The following are the edges in the constructed MST:");
+        foreach (var edge in result)
+        {
+            Console.WriteLine($"{edge.Source} -- {edge.Destination} == {edge.Weight}");
+        }
+    }
+
+    // Main method to test Kruskal's Algorithm
+    static void Main(string[] args)
+    {
+        int verticesCount = 4; // Number of vertices in the graph
+
+        // List of edges in the graph (source, destination, weight)
+        List<Edge> edges = new List<Edge>
+        {
+            new Edge(0, 1, 10),
+            new Edge(0, 2, 6),
+            new Edge(0, 3, 5),
+            new Edge(1, 3, 15),
+            new Edge(2, 3, 4)
+        };
+
+        // Run Kruskal's Algorithm
+        KruskalMST(edges, verticesCount);
+    }
+}
+
+
+using System;
+
+class PrimAlgorithm
+{
+    // Number of vertices in the graph
+    private static readonly int V = 5;
+
+    // Function to find the vertex with the minimum key value
+    // that is not yet included in the MST
+    public static int MinKey(int[] key, bool[] mstSet)
+    {
+        int min = int.MaxValue, minIndex = -1;
+
+        for (int v = 0; v < V; v++)
+        {
+            if (!mstSet[v] && key[v] < min)
+            {
+                min = key[v];
+                minIndex = v;
+            }
+        }
+
+        return minIndex;
+    }
+
+    // Function to print the constructed MST
+    public static void PrintMST(int[] parent, int[,] graph)
+    {
+        Console.WriteLine("Edge \tWeight");
+        for (int i = 1; i < V; i++)
+        {
+            Console.WriteLine($"{parent[i]} - {i} \t{graph[i, parent[i]]}");
+        }
+    }
+
+    // Function to construct and print MST for a graph represented
+    // using adjacency matrix representation
+    public static void PrimMST(int[,] graph)
+    {
+        int[] parent = new int[V]; // Array to store constructed MST
+        int[] key = new int[V];    // Key values to pick the minimum weight edge
+        bool[] mstSet = new bool[V]; // To represent vertices not yet included in MST
+
+        // Initialize all key values as infinite
+        for (int i = 0; i < V; i++)
+        {
+            key[i] = int.MaxValue;
+            mstSet[i] = false;
+        }
+
+        // Start from the first vertex: key value 0 to pick the first vertex
+        key[0] = 0;
+        parent[0] = -1; // First node is always the root of the MST
+
+        // MST will have V vertices
+        for (int count = 0; count < V - 1; count++)
+        {
+            // Pick the minimum key vertex not yet included in the MST
+            int u = MinKey(key, mstSet);
+
+            // Add the picked vertex to the MST set
+            mstSet[u] = true;
+
+            // Update the key values and parent index of the adjacent vertices of the picked vertex
+            for (int v = 0; v < V; v++)
+            {
+                // graph[u, v] is non-zero only for adjacent vertices of u
+                // mstSet[v] is false for vertices not yet included in MST
+                // Update the key only if graph[u, v] is smaller than key[v]
+                if (graph[u, v] != 0 && !mstSet[v] && graph[u, v] < key[v])
+                {
+                    parent[v] = u;
+                    key[v] = graph[u, v];
+                }
+            }
+        }
+
+        // Print the constructed MST
+        PrintMST(parent, graph);
+    }
+
+    // Main method to test Prim's Algorithm
+    static void Main(string[] args)
+    {
+        // Example graph represented as an adjacency matrix
+        int[,] graph = new int[,] {
+            { 0, 2, 0, 6, 0 },
+            { 2, 0, 3, 8, 5 },
+            { 0, 3, 0, 0, 7 },
+            { 6, 8, 0, 0, 9 },
+            { 0, 5, 7, 9, 0 }
+        };
+
+        // Run Prim's Algorithm
+        PrimMST(graph);
+    }
+}
+
+
+using System;
+
+class FibonacciMemoization
+{
+    // Array to store Fibonacci values for memoization
+    private static long[] memo;
+
+    // Method to calculate Fibonacci using memoization
+    public static long Fibonacci(int n)
+    {
+        if (n <= 1)
+            return n;
+
+        // If the value is already computed, return it
+        if (memo[n] != -1)
+            return memo[n];
+
+        // Otherwise, compute the value and store it in the memo array
+        memo[n] = Fibonacci(n - 1) + Fibonacci(n - 2);
+        return memo[n];
+    }
+
+    // Main method to test Fibonacci with memoization
+    static void Main(string[] args)
+    {
+        int n = 50; // You can change this value for testing
+        memo = new long[n + 1];
+
+        // Initialize the memo array with -1 indicating uncalculated values
+        for (int i = 0; i <= n; i++)
+        {
+            memo[i] = -1;
+        }
+
+        long result = Fibonacci(n);
+        Console.WriteLine($"Fibonacci({n}) = {result}");
+    }
+}
+
+
+using System;
+
+class KnapsackProblem
+{
+    // Method to solve the Knapsack problem using dynamic programming
+    public static int Knapsack(int[] weights, int[] values, int capacity, int n)
+    {
+        // dp[i][j] will hold the maximum value that can be attained with a capacity j using the first i items
+        int[,] dp = new int[n + 1, capacity + 1];
+
+        // Build the dp array iteratively
+        for (int i = 0; i <= n; i++)
+        {
+            for (int w = 0; w <= capacity; w++)
+            {
+                if (i == 0 || w == 0)
+                {
+                    dp[i, w] = 0;  // If no items or capacity is 0, value is 0
+                }
+                else if (weights[i - 1] <= w)
+                {
+                    // If the weight of the item is less than or equal to the current capacity, we have two options:
+                    // 1. Include the item and add its value
+                    // 2. Exclude the item
+                    dp[i, w] = Math.Max(values[i - 1] + dp[i - 1, w - weights[i - 1]], dp[i - 1, w]);
+                }
+                else
+                {
+                    // If the item's weight is more than the current capacity, we can't include it
+                    dp[i, w] = dp[i - 1, w];
+                }
+            }
+        }
+
+        // Return the maximum value that can be attained with the given capacity
+        return dp[n, capacity];
+    }
+
+    // Main method to test the Knapsack problem solution
+    static void Main(string[] args)
+    {
+        int[] values = { 60, 100, 120 }; // Values of the items
+        int[] weights = { 10, 20, 30 };  // Weights of the items
+        int capacity = 50;               // Capacity of the knapsack
+        int n = values.Length;           // Number of items
+
+        int result = Knapsack(weights, values, capacity, n);
+        Console.WriteLine("Maximum value in Knapsack = " + result);
+    }
+}
+
+using System;
+
+class LongestCommonSubsequence
+{
+    // Method to find the Longest Common Subsequence using dynamic programming
+    public static int LCS(string s1, string s2)
+    {
+        int m = s1.Length;
+        int n = s2.Length;
+
+        // Create a 2D array to store the lengths of LCS
+        int[,] dp = new int[m + 1, n + 1];
+
+        // Fill the dp array
+        for (int i = 0; i <= m; i++)
+        {
+            for (int j = 0; j <= n; j++)
+            {
+                if (i == 0 || j == 0)
+                {
+                    dp[i, j] = 0;  // Base case: if one of the strings is empty, LCS is 0
+                }
+                else if (s1[i - 1] == s2[j - 1])
+                {
+                    // If the characters match, add 1 to the LCS of the previous characters
+                    dp[i, j] = dp[i - 1, j - 1] + 1;
+                }
+                else
+                {
+                    // If the characters don't match, take the maximum LCS from either previous character in s1 or s2
+                    dp[i, j] = Math.Max(dp[i - 1, j], dp[i, j - 1]);
+                }
+            }
+        }
+
+        // dp[m][n] contains the length of the LCS for s1[0..m-1], s2[0..n-1]
+        return dp[m, n];
+    }
+
+    // Main method to test the LCS solution
+    static void Main(string[] args)
+    {
+        string s1 = "AGGTAB";
+        string s2 = "GXTXAYB";
+
+        int result = LCS(s1, s2);
+        Console.WriteLine("Length of LCS is " + result);
+    }
+}
+
+using System;
+using System.Runtime.InteropServices;
+
+class UnmanagedQueue
+{
+    private IntPtr queuePtr;  // Pointer to the unmanaged memory that holds the queue data
+    private int capacity;
+    private int size;
+    private int front;
+    private int rear;
+
+    public UnmanagedQueue(int capacity)
+    {
+        this.capacity = capacity;
+        this.size = 0;
+        this.front = 0;
+        this.rear = -1;
+
+        // Allocate unmanaged memory for the queue (capacity * size of an integer)
+        queuePtr = Marshal.AllocHGlobal(capacity * sizeof(int));
+        Console.WriteLine("Queue created with capacity: " + capacity);
+    }
+
+    // Enqueue: Adds an item to the queue
+    public void Enqueue(int item)
+    {
+        if (size == capacity)
+        {
+            Console.WriteLine("Queue is full, cannot enqueue.");
+            return;
+        }
+
+        // Move rear pointer and wrap around if needed
+        rear = (rear + 1) % capacity;
+
+        // Store the item in unmanaged memory
+        Marshal.WriteInt32(queuePtr, rear * sizeof(int), item);
+
+        size++;
+        Console.WriteLine("Enqueued: " + item);
+    }
+
+    // Dequeue: Removes an item from the queue
+    public int Dequeue()
+    {
+        if (size == 0)
+        {
+            Console.WriteLine("Queue is empty, cannot dequeue.");
+            return -1;
+        }
+
+        // Read the item from unmanaged memory
+        int item = Marshal.ReadInt32(queuePtr, front * sizeof(int));
+
+        // Move front pointer and wrap around if needed
+        front = (front + 1) % capacity;
+
+        size--;
+        Console.WriteLine("Dequeued: " + item);
+        return item;
+    }
+
+    // Check if the queue is empty
+    public bool IsEmpty()
+    {
+        return size == 0;
+    }
+
+    // Check if the queue is full
+    public bool IsFull()
+    {
+        return size == capacity;
+    }
+
+    // Cleanup the unmanaged memory
+    public void Dispose()
+    {
+        // Free the unmanaged memory
+        if (queuePtr != IntPtr.Zero)
+        {
+            Marshal.FreeHGlobal(queuePtr);
+            queuePtr = IntPtr.Zero;
+            Console.WriteLine("Queue memory freed.");
+        }
+    }
+
+    // Destructor to ensure memory is freed if Dispose is not called
+    ~UnmanagedQueue()
+    {
+        Dispose();
+    }
+}
+
+// Main method to test the UnmanagedQueue
+class Program
+{
+    static void Main(string[] args)
+    {
+        UnmanagedQueue queue = new UnmanagedQueue(5);
+
+        queue.Enqueue(10);
+        queue.Enqueue(20);
+        queue.Enqueue(30);
+        queue.Enqueue(40);
+        queue.Enqueue(50);
+
+        queue.Dequeue();
+        queue.Dequeue();
+
+        queue.Enqueue(60);
+
+        queue.Dispose(); // Free unmanaged memory
+    }
+}

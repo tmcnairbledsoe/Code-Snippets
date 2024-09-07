@@ -1,25 +1,218 @@
-# Create example data
-# Independent variable (predictor)
-x <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+# R functions here:
+# Linear regression
+# logistic regression
+# cluster analysis
+# time series
+# sentiment analysis
 
-# Dependent variable (response)
+
+# Define a function for linear regression
+linear_regression <- function(x, y) {
+  # Calculate the means of x and y
+  x_mean <- mean(x)
+  y_mean <- mean(y)
+  
+  # Calculate the slope (b1) and intercept (b0)
+  b1 <- sum((x - x_mean) * (y - y_mean)) / sum((x - x_mean)^2)
+  b0 <- y_mean - b1 * x_mean
+  
+  return(list(slope = b1, intercept = b0))
+}
+
+# Define a function to make predictions
+predict <- function(x, b0, b1) {
+  return(b0 + b1 * x)
+}
+
+# Example data
+x <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 y <- c(2, 4, 5, 4, 5, 6, 7, 8, 9, 10)
 
-# Create a dataframe
-data <- data.frame(x, y)
+# Perform linear regression
+model <- linear_regression(x, y)
 
-# Fit a linear regression model
-model <- lm(y ~ x, data = data)
+# Print the slope and intercept
+cat("Slope:", model$slope, "\n")
+cat("Intercept:", model$intercept, "\n")
 
-# Print the summary of the model to see results
-summary(model)
+# Make predictions
+y_pred <- predict(x, model$intercept, model$slope)
 
 # Plot the data and the regression line
-plot(x, y, main="Linear Regression", xlab="x", ylab="y", pch=19)
-abline(model, col="blue")
-Explanation:
-Data creation: The example dataset consists of independent variable x and dependent variable y.
-lm() function: This function is used to fit a linear model in R. Here, y ~ x specifies that we want to model y as a function of x.
-summary(): Displays the details of the fitted model, including coefficients, R-squared value, and statistical significance.
-Plotting: The plot() function creates a scatter plot of the data, and abline() adds the regression line to the plot.
-The output will show the slope (coefficient) and intercept of the linear regression line, along with the statistical significance of the model.
+plot(x, y, main = "Linear Regression", xlab = "x", ylab = "y", pch = 19, col = "red")
+abline(a = model$intercept, b = model$slope, col = "blue")
+
+
+# Sigmoid function
+sigmoid <- function(z) {
+  return(1 / (1 + exp(-z)))
+}
+
+# Logistic regression function using gradient descent
+logistic_regression <- function(x, y, learning_rate = 0.01, iterations = 1000) {
+  # Add a column of 1's for the intercept term
+  x <- cbind(1, x)
+  
+  # Initialize weights (coefficients) to zeros
+  weights <- rep(0, ncol(x))
+  
+  # Gradient descent
+  for (i in 1:iterations) {
+    # Calculate the predictions
+    z <- x %*% weights
+    predictions <- sigmoid(z)
+    
+    # Update weights
+    gradient <- t(x) %*% (predictions - y) / length(y)
+    weights <- weights - learning_rate * gradient
+  }
+  
+  return(weights)
+}
+
+# Prediction function
+predict_logistic <- function(x, weights) {
+  # Add a column of 1's for the intercept term
+  x <- cbind(1, x)
+  
+  # Calculate the predictions
+  z <- x %*% weights
+  probabilities <- sigmoid(z)
+  
+  # Convert probabilities to binary outcomes (0 or 1)
+  return(ifelse(probabilities >= 0.5, 1, 0))
+}
+
+# Example data
+# Independent variable (features)
+x <- matrix(c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), ncol = 1)
+
+# Dependent variable (binary outcome)
+y <- c(0, 0, 0, 0, 1, 1, 1, 1, 1, 1)
+
+# Train logistic regression model
+weights <- logistic_regression(x, y, learning_rate = 0.1, iterations = 10000)
+
+# Print the learned weights (coefficients)
+cat("Intercept:", weights[1], "\n")
+cat("Coefficient:", weights[2], "\n")
+
+# Make predictions
+predictions <- predict_logistic(x, weights)
+
+# Display predictions
+cat("Predictions:", predictions, "\n")
+
+# K-means clustering function
+cluster_analysis <- function(data, num_clusters) {
+  # Perform k-means clustering
+  kmeans_result <- kmeans(data, centers = num_clusters, nstart = 25)
+  
+  # Return the cluster assignments and the centroids
+  return(list(clusters = kmeans_result$cluster, centers = kmeans_result$centers))
+}
+
+# Example data
+# Generating some random data points
+set.seed(123)  # For reproducibility
+data <- data.frame(
+  x = rnorm(50, mean = 5, sd = 1.5),  # 50 random points around mean 5
+  y = rnorm(50, mean = 10, sd = 2)    # 50 random points around mean 10
+)
+
+# Perform cluster analysis with 3 clusters
+result <- cluster_analysis(data, num_clusters = 3)
+
+# Print cluster assignments
+print(result$clusters)
+
+# Print cluster centers
+print(result$centers)
+
+# Plot the data with the clusters
+library(ggplot2)
+ggplot(data, aes(x = x, y = y, color = as.factor(result$clusters))) +
+  geom_point(size = 3) +
+  geom_point(data = as.data.frame(result$centers), aes(x = x, y = y), color = "black", size = 5, shape = 8) +
+  labs(color = "Cluster") +
+  ggtitle("K-means Clustering") +
+  theme_minimal()
+
+  # Load necessary library for time series
+library(forecast)
+
+# Time series analysis function
+time_series_analysis <- function(time_series_data, forecast_periods = 12) {
+  
+  # Convert the data into a time series object
+  ts_data <- ts(time_series_data, frequency = 12) # Assuming monthly data
+  
+  # Plot the time series data
+  plot(ts_data, main = "Original Time Series", xlab = "Time", ylab = "Value")
+  
+  # Fit an ARIMA model to the time series data
+  arima_model <- auto.arima(ts_data)
+  
+  # Display model summary
+  print(summary(arima_model))
+  
+  # Forecast future values
+  forecast_result <- forecast(arima_model, h = forecast_periods)
+  
+  # Plot the forecast
+  plot(forecast_result, main = "ARIMA Forecast", xlab = "Time", ylab = "Value")
+  
+  # Return the forecasted values
+  return(forecast_result)
+}
+
+# Example usage of the time series analysis function
+
+# Example data (monthly data for 5 years)
+set.seed(123)
+time_series_data <- cumsum(rnorm(60, mean = 10, sd = 5))
+
+# Perform time series analysis and forecast the next 12 periods
+forecast_result <- time_series_analysis(time_series_data, forecast_periods = 12)
+
+# Print the forecasted values
+print(forecast_result)
+
+# Load necessary libraries
+library(tidytext)
+library(dplyr)
+library(stringr)
+
+# Sentiment analysis function
+sentiment_analysis <- function(text_data) {
+  
+  # Use the "bing" lexicon for sentiment analysis
+  sentiments <- get_sentiments("bing")
+  
+  # Tokenize the text data into words
+  words <- data_frame(text = text_data) %>%
+    unnest_tokens(word, text)
+  
+  # Perform sentiment analysis by matching words with the sentiment lexicon
+  sentiment_scores <- words %>%
+    inner_join(sentiments, by = "word") %>%
+    count(sentiment) %>%
+    spread(sentiment, n, fill = 0) %>%
+    mutate(sentiment_score = positive - negative)
+  
+  # Return the overall sentiment score
+  return(sentiment_scores$sentiment_score)
+}
+
+# Example usage of the sentiment analysis function
+
+# Sample text data
+text_data <- c("I love sunny days and warm weather!",
+               "This is the worst experience ever.",
+               "I am feeling great today.")
+
+# Perform sentiment analysis on each piece of text
+sentiment_results <- sapply(text_data, sentiment_analysis)
+
+# Print sentiment scores for each text
+print(sentiment_results)

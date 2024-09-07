@@ -1,0 +1,548 @@
+# R functions here:
+# Linear regression
+# logistic regression
+# cluster analysis
+# time series
+# sentiment analysis
+# decision tree
+# random Forest
+# K-nearest neighbor
+# Convolutional Neural Net
+# Reccurent Neural Net
+
+#Cleaning:
+# CategoricalMapping
+# Partitions a dataset into training and testing sets.
+# Bring features into same scale
+# Normalize Features
+
+def linear_regression(x, y):
+    # Calculate the mean of x and y
+    x_mean = np.mean(x)
+    y_mean = np.mean(y)
+
+    # Calculate the coefficients
+    numerator = np.sum((x - x_mean) * (y - y_mean))
+    denominator = np.sum((x - x_mean) ** 2)
+    
+    slope = numerator / denominator
+    intercept = y_mean - slope * x_mean
+
+    return slope, intercept
+
+import numpy as np
+
+# Sigmoid function
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+# Logistic regression function using gradient descent
+def logistic_regression(X, y, learning_rate=0.01, iterations=1000):
+    # Initialize weights (coefficients) to zeros
+    weights = np.zeros(X.shape[1])
+    intercept = 0
+    
+    # Gradient descent
+    for i in range(iterations):
+        # Linear combination of weights and features
+        linear_model = np.dot(X, weights) + intercept
+        
+        # Apply sigmoid function to get predictions
+        predictions = sigmoid(linear_model)
+        
+        # Compute gradients
+        dw = (1 / len(y)) * np.dot(X.T, (predictions - y))
+        db = (1 / len(y)) * np.sum(predictions - y)
+        
+        # Update weights and intercept
+        weights -= learning_rate * dw
+        intercept -= learning_rate * db
+    
+    return weights, intercept
+
+# Prediction function
+def predict(X, weights, intercept):
+    # Calculate the probability predictions using the sigmoid function
+    linear_model = np.dot(X, weights) + intercept
+    predictions = sigmoid(linear_model)
+    
+    # Convert probabilities to binary outcomes (0 or 1)
+    return [1 if prob >= 0.5 else 0 for prob in predictions]
+
+# Example usage
+if __name__ == "__main__":
+    # Example data
+    # Feature set (4 samples, 2 features)
+    X = np.array([[1, 2],
+                  [2, 3],
+                  [3, 4],
+                  [4, 5]])
+
+    # Labels (binary outcomes)
+    y = np.array([0, 0, 1, 1])
+
+    # Train the logistic regression model
+    weights, intercept = logistic_regression(X, y, learning_rate=0.1, iterations=1000)
+    
+    # Print the learned weights and intercept
+    print(f"Weights: {weights}")
+    print(f"Intercept: {intercept}")
+
+    # Make predictions
+    predictions = predict(X, weights, intercept)
+
+    # Print predictions
+    print(f"Predictions: {predictions}")
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+
+# Cluster analysis function
+def cluster_analysis(X, num_clusters=3):
+    # Create a KMeans object
+    kmeans = KMeans(n_clusters=num_clusters, random_state=42)
+    
+    # Fit the model and predict cluster labels
+    cluster_labels = kmeans.fit_predict(X)
+    
+    # Return cluster labels and centroids
+    return cluster_labels, kmeans.cluster_centers_
+
+# Example usage of the cluster analysis function
+if __name__ == "__main__":
+    # Generate some example data
+    np.random.seed(42)
+    X = np.random.rand(100, 2)  # 100 points with 2 features
+    
+    # Perform cluster analysis with 3 clusters
+    cluster_labels, centroids = cluster_analysis(X, num_clusters=3)
+    
+    # Plot the data with cluster assignments
+    plt.scatter(X[:, 0], X[:, 1], c=cluster_labels, cmap='viridis', marker='o', edgecolor='k', s=50)
+    
+    # Plot the centroids
+    plt.scatter(centroids[:, 0], centroids[:, 1], c='red', s=200, marker='X', label='Centroids')
+    
+    # Add labels and title
+    plt.title("K-means Clustering")
+    plt.xlabel("Feature 1")
+    plt.ylabel("Feature 2")
+    plt.legend()
+    plt.show()
+
+import numpy as np
+import matplotlib.pyplot as plt
+import pandas as pd
+from statsmodels.tsa.arima.model import ARIMA
+from statsmodels.tsa.stattools import adfuller
+
+# Time series analysis function
+def time_series_analysis(data, order=(1, 1, 1), forecast_periods=12):
+    # Check if the data is stationary using the Augmented Dickey-Fuller test
+    result = adfuller(data)
+    print(f'ADF Statistic: {result[0]}')
+    print(f'p-value: {result[1]}')
+    if result[1] > 0.05:
+        print("Warning: Data is non-stationary. Consider differencing or transforming the data.")
+    
+    # Fit the ARIMA model
+    model = ARIMA(data, order=order)
+    model_fit = model.fit()
+
+    # Print the model summary
+    print(model_fit.summary())
+
+    # Forecast future values
+    forecast = model_fit.forecast(steps=forecast_periods)
+
+    # Plot the original data and forecast
+    plt.figure(figsize=(10, 6))
+    plt.plot(data, label='Original Data')
+    plt.plot(np.arange(len(data), len(data) + forecast_periods), forecast, label='Forecast', color='red')
+    plt.title('ARIMA Time Series Forecast')
+    plt.xlabel('Time')
+    plt.ylabel('Values')
+    plt.legend()
+    plt.show()
+
+    return forecast
+
+# Example usage of the time series analysis function
+if __name__ == "__main__":
+    # Generate some example time series data (for demonstration purposes)
+    np.random.seed(42)
+    data = np.cumsum(np.random.randn(100))  # Example cumulative sum time series
+
+    # Convert the data into a pandas Series
+    time_series_data = pd.Series(data)
+
+    # Perform time series analysis and forecast the next 12 periods
+    forecast_result = time_series_analysis(time_series_data, order=(1, 1, 1), forecast_periods=12)
+
+    # Print forecasted values
+    print(forecast_result)
+
+    from textblob import TextBlob
+
+# Sentiment analysis function
+def sentiment_analysis(text):
+    # Create a TextBlob object
+    blob = TextBlob(text)
+    
+    # Get sentiment polarity (-1 to 1 scale) and subjectivity (0 to 1 scale)
+    sentiment = blob.sentiment
+    polarity = sentiment.polarity  # -1 (negative) to 1 (positive)
+    subjectivity = sentiment.subjectivity  # 0 (objective) to 1 (subjective)
+    
+    # Return polarity and subjectivity
+    return polarity, subjectivity
+
+# Example usage of the sentiment analysis function
+if __name__ == "__main__":
+    # Example text data
+    text_data = [
+        "I love this product! It works perfectly and exceeds expectations.",
+        "This is the worst service I've ever used. Totally disappointed.",
+        "The movie was okay, not great but not terrible either."
+    ]
+    
+    # Perform sentiment analysis on each text
+    for text in text_data:
+        polarity, subjectivity = sentiment_analysis(text)
+        print(f"Text: {text}")
+        print(f"Polarity: {polarity}, Subjectivity: {subjectivity}\n")
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, classification_report
+import matplotlib.pyplot as plt
+from sklearn import tree
+
+# Decision tree function
+def decision_tree_classifier(X, y, test_size=0.2, max_depth=None):
+    # Split the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
+    
+    # Initialize the Decision Tree Classifier
+    clf = DecisionTreeClassifier(max_depth=max_depth, random_state=42)
+    
+    # Train the model
+    clf.fit(X_train, y_train)
+    
+    # Make predictions
+    y_pred = clf.predict(X_test)
+    
+    # Evaluate the model
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"Accuracy: {accuracy}")
+    print("\nClassification Report:")
+    print(classification_report(y_test, y_pred))
+    
+    # Plot the tree
+    plt.figure(figsize=(12, 8))
+    tree.plot_tree(clf, filled=True, feature_names=[f"Feature {i}" for i in range(X.shape[1])], class_names=["Class 0", "Class 1"])
+    plt.title("Decision Tree")
+    plt.show()
+    
+    return clf
+
+
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
+import matplotlib.pyplot as plt
+from sklearn import tree
+
+# Random Forest classifier function
+def random_forest_classifier(X, y, n_estimators=100, test_size=0.2, max_depth=None):
+    # Split the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
+    
+    # Initialize the Random Forest Classifier
+    clf = RandomForestClassifier(n_estimators=n_estimators, max_depth=max_depth, random_state=42)
+    
+    # Train the model
+    clf.fit(X_train, y_train)
+    
+    # Make predictions
+    y_pred = clf.predict(X_test)
+    
+    # Evaluate the model
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"Accuracy: {accuracy}")
+    print("\nClassification Report:")
+    print(classification_report(y_test, y_pred))
+    
+    # Plot one of the trees in the Random Forest
+    plt.figure(figsize=(12, 8))
+    tree.plot_tree(clf.estimators_[0], filled=True, feature_names=[f"Feature {i}" for i in range(X.shape[1])], class_names=["Class 0", "Class 1"])
+    plt.title("Decision Tree in Random Forest")
+    plt.show()
+    
+    return clf
+
+# Example usage of the Random Forest function
+if __name__ == "__main__":
+    # Generate some example binary classification data
+    np.random.seed(42)
+    X = np.random.rand(100, 4)  # 100 samples, 4 features
+    y = np.random.randint(2, size=100)  # Binary labels (0 or 1)
+    
+    # Build, train, and evaluate the Random Forest classifier
+    random_forest_classifier(X, y, n_estimators=10, test_size=0.2, max_depth=3)
+
+
+# Example usage of the decision tree function
+if __name__ == "__main__":
+    # Generate some example binary classification data
+    np.random.seed(42)
+    X = np.random.rand(100, 4)  # 100 samples, 4 features
+    y = np.random.randint(2, size=100)  # Binary labels (0 or 1)
+    
+    # Build, train, and evaluate the decision tree
+    decision_tree_classifier(X, y, test_size=0.2, max_depth=3)
+
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score, classification_report
+import matplotlib.pyplot as plt
+
+# k-NN classifier function
+def knn_classifier(X, y, k=3, test_size=0.2):
+    # Split the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=42)
+    
+    # Initialize the k-NN classifier
+    knn = KNeighborsClassifier(n_neighbors=k)
+    
+    # Train the model
+    knn.fit(X_train, y_train)
+    
+    # Make predictions on the test data
+    y_pred = knn.predict(X_test)
+    
+    # Evaluate the model
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"Accuracy: {accuracy}")
+    print("\nClassification Report:")
+    print(classification_report(y_test, y_pred))
+    
+    return knn
+
+# Example usage of the k-NN function
+if __name__ == "__main__":
+    # Generate some example binary classification data
+    np.random.seed(42)
+    X = np.random.rand(100, 4)  # 100 samples, 4 features
+    y = np.random.randint(2, size=100)  # Binary labels (0 or 1)
+    
+    # Build, train, and evaluate the k-NN classifier
+    knn_classifier(X, y, k=3, test_size=0.2)
+
+import tensorflow as tf
+from tensorflow.keras import datasets, layers, models
+import matplotlib.pyplot as plt
+
+def build_and_train_cnn(epochs=5, optimizer='adam'):
+    """
+    Builds, trains, and evaluates a CNN on the MNIST dataset.
+
+    Parameters:
+    epochs (int): Number of epochs to train the model.
+    optimizer (str): The optimizer to use during model compilation.
+    
+    Returns:
+    model: The trained CNN model.
+    history: The training history, useful for plotting accuracy/loss curves.
+    """
+    # Step 1: Load and preprocess the data
+    (train_images, train_labels), (test_images, test_labels) = datasets.mnist.load_data()
+    
+    # Reshape the data to fit the model (adding a channel dimension for grayscale images)
+    train_images = train_images.reshape((train_images.shape[0], 28, 28, 1))
+    test_images = test_images.reshape((test_images.shape[0], 28, 28, 1))
+    
+    # Normalize the pixel values to the range 0-1
+    train_images, test_images = train_images / 255.0, test_images / 255.0
+    
+    # Step 2: Define the CNN model
+    model = models.Sequential()
+    
+    # Add convolutional layers followed by pooling layers
+    model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(28, 28, 1)))
+    model.add(layers.MaxPooling2D((2, 2)))
+    
+    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+    model.add(layers.MaxPooling2D((2, 2)))
+    
+    model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+    
+    # Flatten the feature maps into a 1D vector
+    model.add(layers.Flatten())
+    
+    # Add dense (fully connected) layers
+    model.add(layers.Dense(64, activation='relu'))
+    model.add(layers.Dense(10, activation='softmax'))  # Output layer for 10 classes
+    
+    # Step 3: Compile the model
+    model.compile(optimizer=optimizer,
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'])
+    
+    # Step 4: Train the model
+    history = model.fit(train_images, train_labels, epochs=epochs, 
+                        validation_data=(test_images, test_labels))
+    
+    # Step 5: Evaluate the model
+    test_loss, test_acc = model.evaluate(test_images, test_labels, verbose=2)
+    print(f"Test accuracy: {test_acc}")
+    
+    # Plot training and validation accuracy/loss
+    plt.plot(history.history['accuracy'], label='accuracy')
+    plt.plot(history.history['val_accuracy'], label = 'val_accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.ylim([0.5, 1])
+    plt.legend(loc='lower right')
+    plt.show()
+    
+    return model, history
+
+# Example usage of the function
+cnn_model, cnn_history = build_and_train_cnn(epochs=5, optimizer='adam')
+
+import tensorflow as tf
+from tensorflow.keras import datasets, layers, models
+import matplotlib.pyplot as plt
+
+def build_and_train_rnn(epochs=5):
+    """
+    Builds, trains, and evaluates a Recurrent Neural Network (RNN) on the MNIST dataset.
+    
+    Parameters:
+    epochs (int): The number of epochs to train the model. Default is 5.
+    
+    Returns:
+    model (tf.keras.Model): The trained RNN model.
+    history (tf.keras.callbacks.History): The training history of the model.
+    test_acc (float): The accuracy of the model on the test dataset.
+    """
+    # Step 1: Load and preprocess the data
+    (train_images, train_labels), (test_images, test_labels) = datasets.mnist.load_data()
+
+    # Reshape the data to add a time step dimension for RNN (keeping the sequence of 28 time steps with 28 features each)
+    train_images = train_images / 255.0
+    test_images = test_images / 255.0
+    
+    # Step 2: Define the RNN model
+    model = models.Sequential()
+
+    # Add a SimpleRNN layer (RNN cells) for sequence data
+    model.add(layers.SimpleRNN(64, input_shape=(28, 28)))
+
+    # Add a dense layer with ReLU activation
+    model.add(layers.Dense(64, activation='relu'))
+
+    # Output layer with softmax activation (for 10 classes)
+    model.add(layers.Dense(10, activation='softmax'))
+
+    # Step 3: Compile the model
+    model.compile(optimizer='adam',
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'])
+
+    # Step 4: Train the model
+    history = model.fit(train_images, train_labels, epochs=epochs, 
+                        validation_data=(test_images, test_labels))
+
+    # Step 5: Evaluate the model
+    test_loss, test_acc = model.evaluate(test_images, test_labels, verbose=2)
+    print(f"Test accuracy: {test_acc}")
+
+    # Plot training and validation accuracy/loss
+    plt.plot(history.history['accuracy'], label='accuracy')
+    plt.plot(history.history['val_accuracy'], label = 'val_accuracy')
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.ylim([0.5, 1])
+    plt.legend(loc='lower right')
+    plt.show()
+
+    return model, history, test_acc
+
+# Example usage
+rnn_model, rnn_history, rnn_test_acc = build_and_train_rnn(epochs=5)
+
+
+import pandas as pd
+#CatigoricalMapping Catigorical Mapping
+def auto_map_ordinal_features(df):
+    """
+    Automatically maps ordinal features in a dataset to numerical values 
+    based on the sorted order of unique values in each column.
+    
+    Parameters:
+    df (pandas.DataFrame): The input DataFrame containing ordinal features.
+    
+    Returns:
+    pandas.DataFrame: The DataFrame with mapped ordinal features.
+    """
+    df_copy = df.copy()
+    
+    for column in df_copy.columns:
+        unique_vals = df_copy[column].dropna().unique()  # Get unique values excluding NaN
+        if pd.api.types.is_string_dtype(df_copy[column]) or pd.api.types.is_categorical_dtype(df_copy[column]):
+            sorted_vals = sorted(unique_vals)  # Sort unique values
+            mapping = {val: idx for idx, val in enumerate(sorted_vals, start=1)}  # Create ordinal mapping
+            df_copy[column] = df_copy[column].map(mapping)
+    
+    return df_copy
+
+from sklearn.model_selection import train_test_split
+import pandas as pd
+
+def partition_dataset(df, target_column, test_size=0.2, random_state=None):
+    """
+    Partitions a dataset into training and testing sets.
+    
+    Parameters:
+    df (pandas.DataFrame): The input DataFrame to be partitioned.
+    target_column (str): The name of the target column (dependent variable).
+    test_size (float): The proportion of the dataset to include in the test split (default is 0.2).
+    random_state (int): Controls the shuffling applied to the data before applying the split (default is None).
+    
+    Returns:
+    tuple: A tuple containing four DataFrames: X_train, X_test, y_train, y_test.
+    """
+    # Separate the features (X) and the target (y)
+    X = df.drop(columns=[target_column])
+    y = df[target_column]
+    
+    # Split the dataset into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
+    
+    return X_train, X_test, y_train, y_test
+
+from sklearn.preprocessing import MinMaxScaler
+import pandas as pd
+
+def normalize_features(df):
+    """
+    Normalizes the features in the dataset to a range between 0 and 1.
+    
+    Parameters:
+    df (pandas.DataFrame): The input DataFrame with features to be normalized.
+    
+    Returns:
+    pandas.DataFrame: The DataFrame with normalized features.
+    """
+    scaler = MinMaxScaler()
+    scaled_array = scaler.fit_transform(df)
+    scaled_df = pd.DataFrame(scaled_array, columns=df.columns)
+    
+    return scaled_df
+
